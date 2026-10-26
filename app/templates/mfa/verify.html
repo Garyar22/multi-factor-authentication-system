@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Two-step verification &middot; MFA System{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+  <h1 class="h3 page-title mb-1">Two-step verification</h1>
+
+  <div class="step-trail mb-4">
+    <span class="step is-done"><span class="step-dot">&#10003;</span> Password</span>
+    <span class="step-sep">&rarr;</span>
+    <span class="step is-current"><span class="step-dot">2</span> Authentication code</span>
+  </div>
+
+  <p class="text-muted mb-4">
+    Signing in as <strong>{{ user.username }}</strong>. Open your authenticator
+    app and enter the current 6-digit code.
+  </p>
+
+  <div class="card">
+    <div class="card-body">
+      <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          <label class="form-label" for="code-input">Authentication code</label>
+          {{ form.code(class="form-control otp-input" + (" is-invalid" if form.code.errors else ""),
+                        id="code-input", required=true, maxlength=6,
+                        placeholder="000000", **{"data-otp-input": "true",
+                                                 "data-otp-autosubmit": "false",
+                                                 "aria-describedby": "code-help"}) }}
+          {% if form.code.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.code.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+          <div class="form-text" id="code-help">
+            Codes change every 30 seconds. If a code has just been used it will
+            not be accepted again &mdash; wait for the next one.
+          </div>
+        </div>
+
+        {{ form.submit(class="btn btn-primary w-100") }}
+      </form>
+    </div>
+  </div>
+
+  <div class="card mt-3">
+    <div class="card-body">
+      <p class="section-label mb-2">Lost your device?</p>
+      <p class="small text-muted mb-3">
+        Use one of the single-use recovery codes you saved when you enabled
+        two-step verification.
+      </p>
+      <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('mfa.recovery') }}">
+        Use a recovery code
+      </a>
+    </div>
+  </div>
+
+  <p class="text-center text-muted small mt-3 mb-0">
+    This verification step expires shortly. If it does, sign in again.
+  </p>
+</div>
+{% endblock %}

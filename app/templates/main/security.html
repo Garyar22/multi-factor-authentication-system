@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Change password &middot; MFA System{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+  <h1 class="h3 page-title mb-1">Change your password</h1>
+  <p class="text-muted mb-4">
+    Your session is reissued afterwards, so any other copy of your old session
+    stops working.
+  </p>
+
+  <div class="card">
+    <div class="card-body">
+      <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          {{ form.current_password.label(class="form-label") }}
+          {{ form.current_password(class="form-control" + (" is-invalid" if form.current_password.errors else ""),
+                                    autocomplete="current-password", required=true) }}
+          {% if form.current_password.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.current_password.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="mb-2">
+          {{ form.password.label(class="form-label") }}
+          <div class="input-group">
+            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""),
+                              autocomplete="new-password", required=true,
+                              **{"data-password-field": "true", "data-min-length": "12",
+                                 "id": "password-field"}) }}
+            <button class="btn btn-outline-secondary" type="button"
+                    data-toggle-password="#password-field" aria-pressed="false">Show</button>
+          </div>
+          {% if form.password.errors %}
+            <div class="text-danger small mt-1">
+              {% for error in form.password.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <div class="pw-meter mb-2" role="progressbar" aria-label="Password strength"
+               aria-valuemin="0" aria-valuemax="5" aria-valuenow="0">
+            <div class="pw-meter-bar" data-password-meter></div>
+          </div>
+          <ul class="pw-rules text-muted" data-password-rules>
+            <li data-rule="length">At least 12 characters</li>
+            <li data-rule="upper">One uppercase letter</li>
+            <li data-rule="lower">One lowercase letter</li>
+            <li data-rule="digit">One digit</li>
+            <li data-rule="symbol">One special character</li>
+          </ul>
+        </div>
+
+        <div class="mb-4">
+          {{ form.confirm_password.label(class="form-label") }}
+          {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else ""),
+                                    autocomplete="new-password", required=true) }}
+          {% if form.confirm_password.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.confirm_password.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        {{ form.submit(class="btn btn-primary w-100") }}
+      </form>
+    </div>
+  </div>
+
+  <p class="text-center small mt-3 mb-0">
+    <a href="{{ url_for('mfa.settings') }}">Back to security settings</a>
+  </p>
+</div>
+{% endblock %}

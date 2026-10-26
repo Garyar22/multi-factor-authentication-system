@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Multi-Factor Authentication System for Securing Web Applications - academic project, ISBAT University.">
+  <title>{% block title %}Multi-Factor Authentication System{% endblock %}</title>
+
+  <!-- Bootstrap 5 and the project stylesheet are served locally, so the
+       Content-Security-Policy can stay strict (no third-party origins). -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <a class="visually-hidden-focusable skip-link" href="#main-content">Skip to main content</a>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark-blue">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('main.index') }}">
+        <span class="brand-mark" aria-hidden="true">MFA</span>
+        <span class="d-none d-sm-inline">Secure Access Demo</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#mainNav" aria-controls="mainNav"
+              aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+          {% if current_user %}
+            <li class="nav-item">
+              <a class="nav-link {% if request.endpoint == 'main.dashboard' %}active{% endif %}"
+                 href="{{ url_for('main.dashboard') }}">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.endpoint == 'main.resources' %}active{% endif %}"
+                 href="{{ url_for('main.resources') }}">Resources</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.blueprint == 'mfa' %}active{% endif %}"
+                 href="{{ url_for('mfa.settings') }}">Security</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.endpoint == 'main.profile' %}active{% endif %}"
+                 href="{{ url_for('main.profile') }}">Profile</a>
+            </li>
+            {% if current_user.is_admin %}
+              <li class="nav-item">
+                <a class="nav-link admin-link {% if request.blueprint == 'admin' %}active{% endif %}"
+                   href="{{ url_for('admin.dashboard') }}">Admin</a>
+              </li>
+            {% endif %}
+            <li class="nav-item d-flex align-items-center ms-lg-2">
+              <span class="navbar-text small me-2">
+                {{ current_user.username }}
+                {% if current_user.mfa_enabled %}
+                  <span class="badge bg-success-subtle text-success-emphasis">MFA on</span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning-emphasis">MFA off</span>
+                {% endif %}
+              </span>
+              <form method="post" action="{{ url_for('auth.logout') }}" class="d-inline">
+                {{ csrf_form.hidden_tag() }}
+                <button type="submit" class="btn btn-sm btn-outline-light">Sign out</button>
+              </form>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('auth.login') }}">Sign in</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-sm btn-light ms-lg-2" href="{{ url_for('auth.register') }}">Create account</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content" class="flex-grow-1 py-4 py-lg-5">
+    <div class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="mb-4" role="status" aria-live="polite">
+            {% for category, message in messages %}
+              <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
+                   role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <footer class="footer border-top py-4 mt-auto">
+    <div class="container">
+      <div class="row gy-2 small text-muted">
+        <div class="col-md-7">
+          <strong>Multi-Factor Authentication System for Securing Web Applications</strong><br>
+          Final-year project &middot; Yahye Ahmed Adan &middot; Bachelor of Networks and Cyber Security<br>
+          ISBAT University, Kampala, Uganda
+        </div>
+        <div class="col-md-5 text-md-end">
+          Version {{ app_version }}<br>
+          Academic demonstration system &mdash; not for production use
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

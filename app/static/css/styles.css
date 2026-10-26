@@ -1,0 +1,386 @@
+/* ==========================================================================
+   Multi-Factor Authentication System - project stylesheet
+   Layered on top of Bootstrap 5.3.3. Served locally so that the
+   Content-Security-Policy needs no third-party origins.
+   ========================================================================== */
+
+:root {
+  --mfa-navy: #10243f;
+  --mfa-navy-soft: #1b3659;
+  --mfa-accent: #1d6fb8;
+  --mfa-accent-dark: #16568e;
+  --mfa-surface: #f5f7fa;
+  --mfa-border: #dde3ec;
+  --mfa-ok: #17795e;
+  --mfa-warn: #9a6b05;
+  --mfa-bad: #b3261e;
+}
+
+body {
+  background-color: var(--mfa-surface);
+  color: #1c2430;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ------------------------------------------------------------ navigation -- */
+
+.bg-dark-blue {
+  background-color: var(--mfa-navy);
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.5rem;
+  background: var(--mfa-accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+.navbar-dark .nav-link {
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 500;
+}
+
+.navbar-dark .nav-link:hover,
+.navbar-dark .nav-link:focus {
+  color: #fff;
+}
+
+.navbar-dark .nav-link.active {
+  color: #fff;
+  box-shadow: inset 0 -2px 0 var(--mfa-accent);
+}
+
+.navbar-dark .nav-link.admin-link::before {
+  content: "\2022";
+  color: #f0b429;
+  margin-right: 0.3rem;
+}
+
+/* Visible focus ring everywhere, for keyboard users. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.btn:focus-visible {
+  outline: 3px solid #f0b429;
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1080;
+  background: #fff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+}
+
+/* ----------------------------------------------------------------- cards -- */
+
+.card {
+  border: 1px solid var(--mfa-border);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgba(16, 36, 63, 0.04);
+}
+
+.card-header {
+  background: #fff;
+  border-bottom: 1px solid var(--mfa-border);
+  font-weight: 600;
+}
+
+.auth-card {
+  max-width: 30rem;
+  margin: 0 auto;
+}
+
+.auth-card-wide {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+
+.page-title {
+  font-weight: 700;
+  color: var(--mfa-navy);
+}
+
+.section-label {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #5b6879;
+}
+
+/* --------------------------------------------------------------- buttons -- */
+
+.btn-primary {
+  background-color: var(--mfa-accent);
+  border-color: var(--mfa-accent);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--mfa-accent-dark);
+  border-color: var(--mfa-accent-dark);
+}
+
+/* ------------------------------------------------------- stats and badges -- */
+
+.stat-card {
+  background: #fff;
+  border: 1px solid var(--mfa-border);
+  border-radius: 0.75rem;
+  padding: 1rem 1.1rem;
+  height: 100%;
+}
+
+.stat-card .stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--mfa-navy);
+}
+
+.stat-card .stat-label {
+  font-size: 0.8rem;
+  color: #5b6879;
+  margin-bottom: 0.15rem;
+}
+
+.stat-card.is-warn .stat-value { color: var(--mfa-warn); }
+.stat-card.is-bad  .stat-value { color: var(--mfa-bad); }
+.stat-card.is-ok   .stat-value { color: var(--mfa-ok); }
+
+/* --------------------------------------------------------------- MFA bits -- */
+
+.qr-frame {
+  display: inline-block;
+  padding: 0.75rem;
+  background: #fff;
+  border: 1px solid var(--mfa-border);
+  border-radius: 0.75rem;
+}
+
+.qr-frame img {
+  display: block;
+  width: 212px;
+  height: 212px;
+  image-rendering: pixelated; /* keeps QR modules crisp when scaled */
+}
+
+.secret-key {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  word-break: break-all;
+  background: #eef2f7;
+  border: 1px dashed #b9c4d4;
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.75rem;
+}
+
+/* Wide, spaced boxes for the 6-digit code: easier to read and to type. */
+.otp-input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.6rem;
+  letter-spacing: 0.5rem;
+  text-align: center;
+  padding: 0.65rem 0.5rem;
+}
+
+.recovery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.5rem;
+}
+
+.recovery-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1rem;
+  background: #fff;
+  border: 1px solid var(--mfa-border);
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.6rem;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+.recovery-code.is-used {
+  text-decoration: line-through;
+  color: #8a95a5;
+  background: #f1f3f6;
+}
+
+/* ---------------------------------------------------------- step progress -- */
+
+.step-trail {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #5b6879;
+  flex-wrap: wrap;
+}
+
+.step-trail .step {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.step-trail .step-dot {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #dde3ec;
+  color: #49566a;
+}
+
+.step-trail .step.is-done .step-dot {
+  background: var(--mfa-ok);
+  color: #fff;
+}
+
+.step-trail .step.is-current .step-dot {
+  background: var(--mfa-accent);
+  color: #fff;
+}
+
+.step-trail .step-sep {
+  color: #b9c4d4;
+}
+
+/* --------------------------------------------------------------- password -- */
+
+.pw-meter {
+  height: 0.4rem;
+  border-radius: 1rem;
+  background: #e3e8ef;
+  overflow: hidden;
+}
+
+.pw-meter-bar {
+  height: 100%;
+  width: 0;
+  background: var(--mfa-bad);
+  transition: width 0.18s ease, background-color 0.18s ease;
+}
+
+.pw-rules {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0;
+  font-size: 0.82rem;
+}
+
+.pw-rules li::before {
+  content: "\2022";
+  color: #8a95a5;
+  display: inline-block;
+  width: 1.1rem;
+  font-weight: 700;
+}
+
+.pw-rules li.met {
+  color: var(--mfa-ok);
+}
+
+.pw-rules li.met::before {
+  content: "\2713";
+  color: var(--mfa-ok);
+}
+
+/* ---------------------------------------------------------------- tables -- */
+
+.table-audit {
+  font-size: 0.86rem;
+}
+
+.table-audit td,
+.table-audit th {
+  vertical-align: middle;
+}
+
+.event-pill {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.74rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 0.3rem;
+  background: #eef2f7;
+  color: #2b3a4d;
+  white-space: nowrap;
+}
+
+.outcome-success { color: var(--mfa-ok); font-weight: 600; }
+.outcome-failure { color: var(--mfa-bad); font-weight: 600; }
+.outcome-blocked { color: var(--mfa-warn); font-weight: 600; }
+
+.hero {
+  background: linear-gradient(135deg, var(--mfa-navy) 0%, var(--mfa-navy-soft) 55%, #26527f 100%);
+  color: #fff;
+  border-radius: 1rem;
+  padding: 2.5rem 1.75rem;
+}
+
+.hero .lead {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.feature-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.6rem;
+  background: #e7effa;
+  color: var(--mfa-accent-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.footer {
+  background: #fff;
+}
+
+@media (max-width: 575.98px) {
+  .otp-input {
+    font-size: 1.3rem;
+    letter-spacing: 0.3rem;
+  }
+  .qr-frame img {
+    width: 176px;
+    height: 176px;
+  }
+  .hero {
+    padding: 1.75rem 1.1rem;
+  }
+}
+
+/* Respect a user's reduced-motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+@media print {
+  .navbar, .footer, .btn, .alert-dismissible .btn-close { display: none !important; }
+  body { background: #fff; }
+  .recovery-code { border: 1px solid #333; }
+}

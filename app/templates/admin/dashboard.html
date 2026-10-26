@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block title %}Administrator dashboard &middot; MFA System{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-4">
+  <div>
+    <h1 class="h3 page-title mb-1">Administrator dashboard</h1>
+    <p class="text-muted mb-0">Authentication statistics and security signals.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin.users') }}">Manage users</a>
+    <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin.audit_log') }}">Audit log</a>
+  </div>
+</div>
+
+<p class="section-label mb-2">Accounts</p>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-label">Registered users</div>
+      <div class="stat-value">{{ stats.total_users }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card is-ok">
+      <div class="stat-label">Active accounts</div>
+      <div class="stat-value">{{ stats.active_users }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card is-ok">
+      <div class="stat-label">MFA adoption</div>
+      <div class="stat-value">{{ stats.mfa_adoption_pct }}%</div>
+      <div class="small text-muted">{{ stats.mfa_users }} of {{ stats.total_users }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card {{ 'is-warn' if stats.locked_users else '' }}">
+      <div class="stat-label">Currently locked out</div>
+      <div class="stat-value">{{ stats.locked_users }}</div>
+    </div>
+  </div>
+</div>
+
+<p class="section-label mb-2">Authentication activity, last 24 hours</p>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="stat-card is-ok">
+      <div class="stat-label">Successful sign-ins</div>
+      <div class="stat-value">{{ stats.logins_24h }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card {{ 'is-bad' if stats.failed_logins_24h > 10 else '' }}">
+      <div class="stat-label">Failed sign-ins</div>
+      <div class="stat-value">{{ stats.failed_logins_24h }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-label">Codes verified</div>
+      <div class="stat-value">{{ stats.mfa_success_24h }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card {{ 'is-warn' if stats.mfa_failed_24h else '' }}">
+      <div class="stat-label">Codes rejected</div>
+      <div class="stat-value">{{ stats.mfa_failed_24h }}</div>
+    </div>
+  </div>
+</div>
+
+<p class="section-label mb-2">Security controls in effect (all time)</p>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-4">
+    <div class="stat-card {{ 'is-warn' if stats.replays_blocked else '' }}">
+      <div class="stat-label">Replayed codes blocked</div>
+      <div class="stat-value">{{ stats.replays_blocked }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-4">
+    <div class="stat-card">
+      <div class="stat-label">Recovery codes used</div>
+      <div class="stat-value">{{ stats.recovery_used }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-4">
+    <div class="stat-card {{ 'is-warn' if stats.access_denied_24h else '' }}">
+      <div class="stat-label">Access denied (24h)</div>
+      <div class="stat-value">{{ stats.access_denied_24h }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header">Usernames with most failed sign-ins (24h)</div>
+      <div class="card-body p-0">
+        {% if hotspots %}
+          <div class="table-responsive">
+            <table class="table table-sm table-audit mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">Username attempted</th>
+                  <th scope="col" class="text-end">Failures</th>
+                  <th scope="col">Last seen (UTC)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in hotspots %}
+                  <tr>
+                    <td class="text-break">{{ row[0] }}</td>
+                    <td class="text-end fw-semibold
+                        {{ 'text-danger' if row[1] >= 5 else '' }}">{{ row[1] }}</td>
+                    <td class="text-nowrap">{{ row[2].strftime('%d %b %H:%M') }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted small p-3 mb-0">No failed sign-ins in the last 24 hours.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header">Source addresses with most failures (24h)</div>
+      <div class="card-body p-0">
+        {% if source_ips %}
+          <div class="table-responsive">
+            <table class="table table-sm table-audit mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">IP address</th>
+                  <th scope="col" class="text-end">Failures</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in source_ips %}
+                  <tr>
+                    <td>{{ row[0] }}</td>
+                    <td class="text-end fw-semibold
+                        {{ 'text-danger' if row[1] >= 5 else '' }}">{{ row[1] }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted small p-3 mb-0">No failed sign-ins in the last 24 hours.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span>Most recent security events</span>
+    <a class="small" href="{{ url_for('admin.audit_log') }}">View full log</a>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm table-audit mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">When (UTC)</th>
+            <th scope="col">Event</th>
+            <th scope="col">Outcome</th>
+            <th scope="col">Account</th>
+            <th scope="col">Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for event in recent_events %}
+            <tr>
+              <td class="text-nowrap">{{ event.created_at.strftime('%d %b %H:%M:%S') }}</td>
+              <td><span class="event-pill">{{ event.event_type }}</span></td>
+              <td class="outcome-{{ event.outcome }}">{{ event.outcome }}</td>
+              <td class="text-break">
+                {% if event.user %}{{ event.user.username }}
+                {% elif event.username_attempted %}{{ event.username_attempted }}
+                {% else %}&mdash;{% endif %}
+              </td>
+              <td>{{ event.ip_address or '&mdash;' | safe }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="5" class="text-muted small">No events recorded yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

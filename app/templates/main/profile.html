@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Profile &middot; MFA System{% endblock %}
+
+{% block content %}
+<div class="auth-card-wide">
+  <h1 class="h3 page-title mb-4">Your profile</h1>
+
+  <div class="row g-4">
+    <div class="col-md-7">
+      <div class="card">
+        <div class="card-header">Edit details</div>
+        <div class="card-body">
+          <form method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+              {{ form.full_name.label(class="form-label") }}
+              {{ form.full_name(class="form-control", autocomplete="name") }}
+            </div>
+            {{ form.submit(class="btn btn-primary") }}
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-5">
+      <div class="card">
+        <div class="card-header">Account</div>
+        <div class="card-body">
+          <dl class="row small mb-0">
+            <dt class="col-5">Username</dt><dd class="col-7">{{ user.username }}</dd>
+            <dt class="col-5">Email</dt><dd class="col-7 text-break">{{ user.email }}</dd>
+            <dt class="col-5">Role</dt><dd class="col-7 text-capitalize">{{ user.role.name }}</dd>
+            <dt class="col-5">Status</dt>
+            <dd class="col-7">
+              {% if user.is_active %}
+                <span class="badge bg-success">Active</span>
+              {% else %}
+                <span class="badge bg-secondary">Inactive</span>
+              {% endif %}
+            </dd>
+            <dt class="col-5">Two-step</dt>
+            <dd class="col-7">
+              {% if user.mfa_enabled %}
+                <span class="badge bg-success">Enabled</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">Disabled</span>
+              {% endif %}
+            </dd>
+            <dt class="col-5">Registered</dt>
+            <dd class="col-7">{{ user.created_at.strftime('%d %b %Y') }}</dd>
+          </dl>
+        </div>
+      </div>
+
+      <p class="small text-muted mt-3 mb-0">
+        Username and email are fixed in this demonstration system, because
+        changing them would need a fresh identity-verification step.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

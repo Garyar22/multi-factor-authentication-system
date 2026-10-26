@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Generate new recovery codes &middot; MFA System{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+  <h1 class="h3 page-title mb-1">Generate new recovery codes</h1>
+  <p class="text-muted mb-4">
+    Confirm your password first. The new set replaces the old one, so any codes
+    you have written down will stop working.
+  </p>
+
+  <div class="card">
+    <div class="card-body">
+      <form method="post" novalidate
+            data-confirm="Replace your existing recovery codes? The old ones will stop working.">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.password.label(class="form-label") }}
+          {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""),
+                            autocomplete="current-password", required=true, autofocus=true) }}
+          {% if form.password.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.password.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+        {{ form.submit(class="btn btn-primary w-100", value="Generate new codes") }}
+      </form>
+    </div>
+  </div>
+
+  <p class="text-center small mt-3 mb-0">
+    <a href="{{ url_for('mfa.settings') }}">Cancel</a>
+  </p>
+</div>
+{% endblock %}

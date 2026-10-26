@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Multi-Factor Authentication System &middot; Home{% endblock %}
+
+{% block content %}
+<div class="hero mb-5">
+  <div class="row align-items-center g-4">
+    <div class="col-lg-7">
+      <p class="section-label text-white-50 mb-2">Final-year project &middot; ISBAT University</p>
+      <h1 class="display-6 fw-bold mb-3">Multi-Factor Authentication for Web Applications</h1>
+      <p class="lead mb-4">
+        A working demonstration of layered authentication: a strong password
+        hashed with Argon2id, followed by a time-based one-time password from
+        an authenticator application. A stolen password alone is not enough to
+        reach a protected page.
+      </p>
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-light btn-lg" href="{{ url_for('auth.register') }}">Create an account</a>
+        <a class="btn btn-outline-light btn-lg" href="{{ url_for('auth.login') }}">Sign in</a>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="bg-white text-dark rounded-3 p-3 p-lg-4">
+        <p class="section-label mb-3">How signing in works</p>
+        <ol class="mb-0 ps-3">
+          <li class="mb-2">You enter your username and password.</li>
+          <li class="mb-2">The server verifies the Argon2id hash.</li>
+          <li class="mb-2">A short-lived pending state is created &mdash; not a session.</li>
+          <li class="mb-2">You enter the 6-digit code from your authenticator app.</li>
+          <li class="mb-0">Only then is a full session issued.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-5">
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="feature-icon mb-3" aria-hidden="true">A2</div>
+        <h2 class="h5">Argon2id password hashing</h2>
+        <p class="text-muted mb-0 small">
+          Memory-hard hashing with a per-user salt. Plaintext passwords are
+          never stored, logged or recoverable.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="feature-icon mb-3" aria-hidden="true">OTP</div>
+        <h2 class="h5">TOTP second factor</h2>
+        <p class="text-muted mb-0 small">
+          RFC 6238 codes from any standard authenticator app, with a documented
+          clock-skew window and single-use enforcement per time step.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="feature-icon mb-3" aria-hidden="true">KEY</div>
+        <h2 class="h5">Secrets encrypted at rest</h2>
+        <p class="text-muted mb-0 small">
+          TOTP seeds are encrypted with a key held outside the database, so a
+          database dump alone yields nothing usable.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="feature-icon mb-3" aria-hidden="true">RC</div>
+        <h2 class="h5">Single-use recovery codes</h2>
+        <p class="text-muted mb-0 small">
+          Ten hashed backup codes, each valid once, so a lost phone does not
+          mean a lost account.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="feature-icon mb-3" aria-hidden="true">LOG</div>
+        <h2 class="h5">Security audit trail</h2>
+        <p class="text-muted mb-0 small">
+          Every authentication decision is recorded &mdash; without ever writing
+          a password, OTP value or recovery code to the log.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="feature-icon mb-3" aria-hidden="true">RBA</div>
+        <h2 class="h5">Role-based access control</h2>
+        <p class="text-muted mb-0 small">
+          Administrator and user roles, enforced on the server for every
+          protected operation rather than by hiding links.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h2 class="h5 mb-3">Scope and honest limitations</h2>
+    <p class="small text-muted mb-2">
+      TOTP protects against a compromised password: credential stuffing, a
+      leaked password database, or a weak reused password. It is
+      <strong>not</strong> phishing-resistant &mdash; a real-time phishing proxy
+      can relay a code within its validity window. Origin-bound credentials
+      such as WebAuthn/passkeys are the phishing-resistant answer, and are
+      documented as future work rather than claimed here.
+    </p>
+    <p class="small text-muted mb-0">
+      This is an academic demonstration system built for assessment at ISBAT
+      University. It is not hardened for production use.
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Sign in &middot; MFA System{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+  <h1 class="h3 page-title mb-1">Sign in</h1>
+
+  <div class="step-trail mb-4">
+    <span class="step is-current"><span class="step-dot">1</span> Password</span>
+    <span class="step-sep">&rarr;</span>
+    <span class="step"><span class="step-dot">2</span> Authentication code</span>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+        {% if request.args.get('next') %}
+          <input type="hidden" name="next" value="{{ request.args.get('next') }}">
+        {% endif %}
+
+        <div class="mb-3">
+          {{ form.username.label(class="form-label") }}
+          {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""),
+                            autocomplete="username", required=true, autofocus=true) }}
+          {% if form.username.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.username.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-baseline">
+            {{ form.password.label(class="form-label") }}
+            <a class="small" href="{{ url_for('auth.forgot_password') }}">Forgot password?</a>
+          </div>
+          <div class="input-group">
+            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""),
+                              autocomplete="current-password", required=true, id="login-password") }}
+            <button class="btn btn-outline-secondary" type="button"
+                    data-toggle-password="#login-password" aria-pressed="false">Show</button>
+          </div>
+          {% if form.password.errors %}
+            <div class="text-danger small mt-1">
+              {% for error in form.password.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        {{ form.submit(class="btn btn-primary w-100") }}
+      </form>
+    </div>
+  </div>
+
+  <p class="text-center text-muted small mt-3 mb-0">
+    No account yet? <a href="{{ url_for('auth.register') }}">Create one</a>
+  </p>
+</div>
+{% endblock %}

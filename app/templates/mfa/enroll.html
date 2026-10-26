@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Set up two-step verification &middot; MFA System{% endblock %}
+
+{% block content %}
+<div class="auth-card-wide">
+  <h1 class="h3 page-title mb-1">Set up two-step verification</h1>
+  <p class="text-muted mb-4">
+    Scan the QR code with an authenticator app, then prove it works by entering
+    a code. Two-step verification is only switched on once a code is accepted.
+  </p>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header">Step 1 &mdash; Add the account</div>
+        <div class="card-body text-center">
+          <div class="qr-frame mb-3">
+            <img src="{{ qr_uri }}"
+                 alt="QR code to add this account to your authenticator app">
+          </div>
+          <p class="small text-muted mb-3">
+            Works with Google Authenticator, Microsoft Authenticator, Authy,
+            FreeOTP, Aegis and any other RFC 6238 app.
+          </p>
+
+          <p class="section-label mb-2">Cannot scan? Enter this key by hand</p>
+          <p class="secret-key mb-2" id="totp-secret">{{ secret }}</p>
+          <button type="button" class="btn btn-sm btn-outline-secondary"
+                  data-copy-target="#totp-secret">Copy key</button>
+
+          <dl class="row small text-start text-muted mt-3 mb-0">
+            <dt class="col-5">Account</dt><dd class="col-7">{{ user.email }}</dd>
+            <dt class="col-5">Issuer</dt><dd class="col-7">{{ issuer }}</dd>
+            <dt class="col-5">Type</dt><dd class="col-7">Time-based (TOTP)</dd>
+            <dt class="col-5">Digits</dt><dd class="col-7">6</dd>
+            <dt class="col-5">Interval</dt><dd class="col-7">30 seconds</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header">Step 2 &mdash; Confirm it works</div>
+        <div class="card-body">
+          <form method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+              <label class="form-label" for="enroll-code">Code from your app</label>
+              {{ form.code(class="form-control otp-input" + (" is-invalid" if form.code.errors else ""),
+                            id="enroll-code", required=true, maxlength=6, placeholder="000000",
+                            **{"data-otp-input": "true", "data-otp-autosubmit": "false"}) }}
+              {% if form.code.errors %}
+                <div class="invalid-feedback">
+                  {% for error in form.code.errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            {{ form.submit(class="btn btn-primary w-100", value="Enable two-step verification") }}
+          </form>
+
+          <hr class="my-4">
+
+          <p class="section-label mb-2">What happens next</p>
+          <ul class="small text-muted mb-0 ps-3">
+            <li class="mb-1">Your account is marked as MFA-enabled.</li>
+            <li class="mb-1">Ten single-use recovery codes are generated and shown once.</li>
+            <li class="mb-1">Every future sign-in asks for a code after your password.</li>
+            <li class="mb-0">Your secret is encrypted before it is stored.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-light border mt-4 small mb-0">
+    <strong>Keep this page open</strong> until your authenticator app shows a
+    code and you have entered it. If you leave now, nothing is enabled and a
+    new key will be issued next time.
+  </div>
+
+  <p class="mt-3 mb-0">
+    <a href="{{ url_for('mfa.settings') }}">Cancel and return to security settings</a>
+  </p>
+</div>
+{% endblock %}

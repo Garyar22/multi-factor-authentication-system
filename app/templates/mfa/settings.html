@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Security settings &middot; MFA System{% endblock %}
+
+{% block content %}
+<div class="auth-card-wide">
+  <h1 class="h3 page-title mb-4">Security settings</h1>
+
+  {% if recovery_codes %}
+    <div class="card border-warning mb-4">
+      <div class="card-header bg-warning-subtle">
+        Your recovery codes &mdash; shown once only
+      </div>
+      <div class="card-body">
+        <p class="small mb-3">
+          Save these now. They are stored only as hashes, so this page cannot
+          show them again. Each code works once.
+        </p>
+
+        <div class="recovery-grid mb-3">
+          {% for code in recovery_codes %}
+            <div class="recovery-code">{{ code }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+          <form method="post" action="{{ url_for('mfa.download_codes') }}">
+            {{ csrf_form.hidden_tag() }}
+            <button type="submit" class="btn btn-sm btn-primary">Download as a text file</button>
+          </form>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-print-page>
+            Print this page
+          </button>
+          <form method="post" action="{{ url_for('mfa.dismiss_codes') }}"
+                data-confirm="Hide these codes? They cannot be shown again.">
+            {{ csrf_form.hidden_tag() }}
+            <button type="submit" class="btn btn-sm btn-outline-secondary">
+              I have saved these
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="card mb-4">
+    <div class="card-header">Two-step verification (TOTP)</div>
+    <div class="card-body">
+      {% if user.mfa_enabled %}
+        <p class="mb-3">
+          <span class="badge bg-success">Enabled</span>
+          <span class="text-muted small ms-2">
+            Confirmed {{ user.mfa_credential.confirmed_at.strftime('%d %B %Y at %H:%M') }} UTC
+          </span>
+        </p>
+        <p class="small text-muted">
+          Your account asks for an authenticator code after your password. A
+          stolen password on its own cannot reach your dashboard.
+        </p>
+
+        <dl class="row small mb-4">
+          <dt class="col-sm-5">Unused recovery codes</dt>
+          <dd class="col-sm-7">
+            {{ remaining_codes }}
+            {% if remaining_codes <= 2 %}
+              <span class="badge bg-warning-subtle text-warning-emphasis">Running low</span>
+            {% endif %}
+          </dd>
+          <dt class="col-sm-5">Secret storage</dt>
+          <dd class="col-sm-7">Encrypted (Fernet / AES-128-CBC with HMAC-SHA256)</dd>
+          <dt class="col-sm-5">Replay protection</dt>
+          <dd class="col-sm-7">Each time step accepted at most once</dd>
+        </dl>
+
+        <div class="d-flex flex-wrap gap-2">
+          <a class="btn btn-outline-primary btn-sm" href="{{ url_for('mfa.regenerate_codes') }}">
+            Generate new recovery codes
+          </a>
+          <a class="btn btn-outline-danger btn-sm" href="{{ url_for('mfa.disable') }}">
+            Disable two-step verification
+          </a>
+        </div>
+      {% else %}
+        <p class="mb-3"><span class="badge bg-warning text-dark">Not enabled</span></p>
+        <p class="small text-muted">
+          Your account is currently protected by your password alone. If that
+          password is ever leaked or guessed, nothing else stands in the way.
+        </p>
+        <a class="btn btn-primary" href="{{ url_for('mfa.enroll') }}">
+          Set up two-step verification
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">Password</div>
+    <div class="card-body">
+      <dl class="row small mb-3">
+        <dt class="col-sm-5">Hashing algorithm</dt>
+        <dd class="col-sm-7">Argon2id with a per-user salt</dd>
+        <dt class="col-sm-5">Last changed</dt>
+        <dd class="col-sm-7">
+          {% if user.password_changed_at %}
+            {{ user.password_changed_at.strftime('%d %B %Y at %H:%M') }} UTC
+          {% else %}
+            Not recorded
+          {% endif %}
+        </dd>
+      </dl>
+      <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('main.security_settings') }}">
+        Change password
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

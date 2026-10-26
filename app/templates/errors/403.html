@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Access denied &middot; MFA System{% endblock %}
+
+{% block content %}
+<div class="auth-card text-center py-4">
+  <p class="display-4 fw-bold text-muted mb-2">403</p>
+  <h1 class="h3 page-title mb-3">Access denied</h1>
+  <p class="text-muted mb-4">Your account does not have permission to view this page. This decision is made on the server for every request, and the attempt has been recorded in the security audit log.</p>
+  <div class="d-flex justify-content-center gap-2 flex-wrap">
+    <a class="btn btn-primary" href="{{ url_for('main.index') }}">Go to the home page</a>
+    {% if current_user %}
+      <a class="btn btn-outline-secondary" href="{{ url_for('main.dashboard') }}">Your dashboard</a>
+    {% else %}
+      <a class="btn btn-outline-secondary" href="{{ url_for('auth.login') }}">Sign in</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

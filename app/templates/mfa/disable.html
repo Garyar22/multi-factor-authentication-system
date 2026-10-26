@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Disable two-step verification &middot; MFA System{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+  <h1 class="h3 page-title mb-1">Disable two-step verification</h1>
+  <p class="text-muted mb-4">
+    This is a sensitive change, so it needs both your password and a current
+    authenticator code. A hijacked session alone cannot strip your second factor.
+  </p>
+
+  <div class="alert alert-warning small">
+    After this, your account will be protected by your password only, and your
+    existing recovery codes will be deleted.
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <form method="post" novalidate
+            data-confirm="Disable two-step verification on this account?">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          {{ form.password.label(class="form-label") }}
+          {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""),
+                            autocomplete="current-password", required=true) }}
+          {% if form.password.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.password.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.code.label(class="form-label") }}
+          {{ form.code(class="form-control otp-input" + (" is-invalid" if form.code.errors else ""),
+                        required=true, maxlength=6, placeholder="000000",
+                        **{"data-otp-input": "true"}) }}
+          {% if form.code.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.code.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-check mb-4">
+          {{ form.confirm(class="form-check-input" + (" is-invalid" if form.confirm.errors else ""),
+                           id="confirm-field") }}
+          <label class="form-check-label small" for="confirm-field">
+            I understand my account will be protected by my password only.
+          </label>
+          {% if form.confirm.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.confirm.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        {{ form.submit(class="btn btn-danger w-100") }}
+      </form>
+    </div>
+  </div>
+
+  <p class="text-center small mt-3 mb-0">
+    <a href="{{ url_for('mfa.settings') }}">Cancel and keep two-step verification</a>
+  </p>
+</div>
+{% endblock %}

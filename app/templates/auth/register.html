@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Create account &middot; MFA System{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+  <h1 class="h3 page-title mb-1">Create your account</h1>
+  <p class="text-muted mb-4">
+    After signing in you will be able to enable two-step verification.
+  </p>
+
+  <div class="card">
+    <div class="card-body">
+      <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          {{ form.username.label(class="form-label") }}
+          {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""),
+                            autocomplete="username", required=true, maxlength=64) }}
+          {% if form.username.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.username.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% else %}
+            <div class="form-text">3&ndash;64 characters: letters, digits, dot, dash or underscore.</div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.email.label(class="form-label") }}
+          {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""),
+                         type="email", autocomplete="email", required=true) }}
+          {% if form.email.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.email.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.full_name.label(class="form-label") }}
+          <span class="text-muted small">(optional)</span>
+          {{ form.full_name(class="form-control", autocomplete="name") }}
+        </div>
+
+        <div class="mb-2">
+          {{ form.password.label(class="form-label") }}
+          <div class="input-group">
+            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""),
+                              autocomplete="new-password", required=true,
+                              **{"data-password-field": "true", "data-min-length": "12",
+                                 "id": "password-field"}) }}
+            <button class="btn btn-outline-secondary" type="button"
+                    data-toggle-password="#password-field" aria-pressed="false">Show</button>
+          </div>
+          {% if form.password.errors %}
+            <div class="text-danger small mt-1">
+              {% for error in form.password.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <div class="pw-meter mb-2" role="progressbar" aria-label="Password strength"
+               aria-valuemin="0" aria-valuemax="5" aria-valuenow="0">
+            <div class="pw-meter-bar" data-password-meter></div>
+          </div>
+          <ul class="pw-rules text-muted" data-password-rules>
+            <li data-rule="length">At least 12 characters</li>
+            <li data-rule="upper">One uppercase letter</li>
+            <li data-rule="lower">One lowercase letter</li>
+            <li data-rule="digit">One digit</li>
+            <li data-rule="symbol">One special character</li>
+          </ul>
+          <p class="form-text mb-0">
+            These hints are a convenience. The same rules are enforced on the server.
+          </p>
+        </div>
+
+        <div class="mb-3">
+          {{ form.confirm_password.label(class="form-label") }}
+          {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else ""),
+                                    autocomplete="new-password", required=true) }}
+          {% if form.confirm_password.errors %}
+            <div class="invalid-feedback">
+              {% for error in form.confirm_password.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-check mb-4">
+          {{ form.accept(class="form-check-input" + (" is-invalid" if form.accept.errors else ""),
+                          id="accept-field") }}
+          <label class="form-check-label small" for="accept-field">
+            I understand this is an academic demonstration system and will not
+            use a real or reused password.
+          </label>
+          {% if form.accept.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.accept.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        {{ form.submit(class="btn btn-primary w-100") }}
+      </form>
+    </div>
+  </div>
+
+  <p class="text-center text-muted small mt-3 mb-0">
+    Already registered? <a href="{{ url_for('auth.login') }}">Sign in</a>
+  </p>
+</div>
+{% endblock %}

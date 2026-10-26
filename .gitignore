@@ -1,0 +1,55 @@
+# =============================================================================
+# Keep secrets, local state and build noise out of version control.
+# =============================================================================
+
+# --- SECRETS: never commit these ---------------------------------------------
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets/
+instance/
+
+# --- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+venv/
+.venv/
+env/
+ENV/
+
+# --- Testing and coverage ----------------------------------------------------
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.tox/
+
+# --- Databases and logs ------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+logs/
+*.log
+
+# --- Editors and operating systems -------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- local setup helpers that contain a real password ---
+scripts/create_database_ready.sql
+
